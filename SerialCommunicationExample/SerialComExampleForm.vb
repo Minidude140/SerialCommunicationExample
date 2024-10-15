@@ -2,7 +2,6 @@
 Imports System.Threading
 Public Class SerialComExampleForm
     Private Sub SerialComExampleForm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        CatGifWebBrowser.Visible = False
         'Set up port name and baud rate
         SerialPort1.PortName = "COM5"
         SerialPort1.BaudRate = 9600
@@ -11,14 +10,9 @@ Public Class SerialComExampleForm
     End Sub
 
     Private Sub DiscoLightsButton_Click(sender As Object, e As EventArgs) Handles DiscoLightsButton.Click
-        CatGifWebBrowser.Visible = True
-        CatGifWebBrowser.BringToFront()
-        CatGifWebBrowser.Refresh()
-
         DiscoLightsButton.Enabled = False
         StartDiscoLights()
         DiscoLightsButton.Enabled = True
-        CatGifWebBrowser.Visible = False
     End Sub
 
     Private Sub SerialPort1_DataReceived(sender As Object, e As SerialDataReceivedEventArgs) Handles SerialPort1.DataReceived
@@ -40,7 +34,7 @@ Public Class SerialComExampleForm
         'populate the byte array
         data(0) = &H20
         data(1) = output
-        'write the data byte array starting at bit 0 and sending one byte
+        'write the data byte array starting at bit 0 and sending two bytes
         SerialPort1.Write(data, 0, 2)
     End Sub
 

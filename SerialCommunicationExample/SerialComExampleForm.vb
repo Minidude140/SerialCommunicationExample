@@ -2,20 +2,6 @@
 Imports System.Threading
 Public Class SerialComExampleForm
     '*****************Custom Methods*******************************
-    ''' <summary>
-    ''' Gets a Series of data from the Quiet Board and writes to the output console
-    ''' </summary>
-    Sub GetQySettings()
-        'create an array of bytes with the length of given bytes
-        Dim data(SerialPort1.BytesToRead) As Byte
-        'populates data with incoming port data starting at 0 bit and reading the full bytes
-        SerialPort1.Read(data, 0, SerialPort1.BytesToRead)
-        'loops through the data array and writes each item to console (converts to hex)
-        For i = 0 To UBound(data)
-            Console.Write($"{Hex(data(i))}: ")
-            Console.WriteLine(Chr(data(i)))
-        Next
-    End Sub
 
     ''' <summary>
     ''' Writes the Given Digital Byte to the Digital Output Pins on the Quiet Board
@@ -44,6 +30,65 @@ Public Class SerialComExampleForm
         WriteDigitalOut(&H0)
     End Sub
 
+    ''' <summary>
+    ''' Gets a Series of data from the Quiet Board and writes to the output console
+    ''' </summary>
+    Sub GetQySettings()
+        'command QY Board to output settings data
+        Dim command(0) As Byte
+        command(0) = &B11110000
+        SerialPort1.Write(command, 0, 1)
+        'create an array of bytes with the length of given bytes
+        Dim data(SerialPort1.BytesToRead) As Byte
+        'populates data with incoming port data starting at 0 bit and reading the full bytes
+        SerialPort1.Read(data, 0, SerialPort1.BytesToRead)
+        'loops through the data array and writes each item to console (converts to hex)
+        For i = 0 To UBound(data)
+            Console.Write($"{Hex(data(i))}: ")
+            Console.WriteLine(Chr(data(i)))
+        Next
+    End Sub
+
+    ''' <summary>
+    ''' Read Analog Input 1 and Output Result (High Byte) to A1 Label
+    ''' </summary>
+    Sub Qy_AnalogReadA1()
+        ReadA1Button.Enabled = False
+        'command to QY board to read analog data
+        Dim command(0) As Byte
+        command(0) = &B1010001
+        SerialPort1.Write(command, 0, 1)
+        'create an array of bytes with the length of given bytes
+        Thread.Sleep(5)
+
+        Dim data(SerialPort1.BytesToRead) As Byte
+        SerialPort1.Read(data, 0, SerialPort1.BytesToRead)
+
+        A1InputLabel.Text = CStr(data(0))
+
+        ReadA1Button.Enabled = True
+    End Sub
+
+    ''' <summary>
+    ''' Read Analog Input 2 and Output Result (High Byte) to A2 Label
+    ''' </summary>
+    Sub Qy_AnalogReadA2()
+        ReadA2Button.Enabled = False
+        'command to QY board to read analog data
+        Dim command(0) As Byte
+        command(0) = &B1010010
+        SerialPort1.Write(command, 0, 1)
+        'create an array of bytes with the length of given bytes
+        Thread.Sleep(5)
+
+        Dim data(SerialPort1.BytesToRead) As Byte
+        SerialPort1.Read(data, 0, SerialPort1.BytesToRead)
+
+        A2InputLabel.Text = CStr(data(0))
+
+        ReadA2Button.Enabled = True
+    End Sub
+
     '****************Event Handlers**************************************************
     Private Sub SerialComExampleForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         'Set up port name and baud rate
@@ -57,5 +102,17 @@ Public Class SerialComExampleForm
         DiscoLightsButton.Enabled = False
         StartDiscoLights()
         DiscoLightsButton.Enabled = True
+    End Sub
+
+    Private Sub GetSettingsButton_Click(sender As Object, e As EventArgs) Handles GetSettingsButton.Click
+        GetQySettings()
+    End Sub
+
+    Private Sub ReadA1Button_Click(sender As Object, e As EventArgs) Handles ReadA1Button.Click
+        Qy_AnalogReadA1()
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles ReadA2Button.Click
+        Qy_AnalogReadA2()
     End Sub
 End Class
